@@ -1,0 +1,3 @@
+# org.springframework.boot.autoconfigure.EnableAutoConfiguration 代表自动配置的 key 即代表需要自动配置哪些类
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.ioc.assembly.config.ExcelAutoConfiguration
