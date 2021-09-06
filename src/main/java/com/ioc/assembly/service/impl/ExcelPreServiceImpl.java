@@ -72,6 +72,43 @@ public class ExcelPreServiceImpl implements ExcelPreService {
         }
     }
 
+    @Override
+    public void excelPreJson(MultipartFile file, String json) {
+        String fileName = file.getOriginalFilename();
+        if (!fileName.matches("^.+\\.(?i)(xls)$") && !fileName.matches("^.+\\.(?i)(xlsx)$")) {
+            log.error("上传文件格式不正确");
+        }
+
+        Workbook workbook = null;
+        try{
+            InputStream is = file.getInputStream();
+            if (fileName.endsWith(EXCEL2007)) {
+                workbook = new XSSFWorkbook(is);
+            }
+            if (fileName.endsWith(EXCEL2003)) {
+                workbook = new HSSFWorkbook(is);
+            }
+            Sheet sheet = workbook.getSheetAt(0);
+            List<RuleDO> rulesList = excelTitleValidateService.validateExcelTitleJson(sheet,json);
+            log.info("=====校验规则集合：{}======", rulesList);
+            if(!CollectionUtils.isEmpty(rulesList)){
+                rulesList.stream().forEach(ruleDO -> {
+                    // 支持多规则校验
+                    String[] ruleArray = ruleDO.getRule().split(",");
+                    for(String rl :ruleArray){
+                        excelStrategyService.validByType(sheet,ruleDO.getMap(),rl);
+                    }
+
+                });
+            }
+
+        }catch (RuntimeException e){
+            throw new RuntimeException(e.getMessage());
+        }catch (Exception e){
+            log.error("未找到要处理的类，请确认传入的校验类型是否正确！");
+        }
+    }
+
     public static void main(String[] args) {
         String str = "validateStr";
         String[] strs = str.split(",");

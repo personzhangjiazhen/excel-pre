@@ -14,4 +14,11 @@ public interface ExcelPreService {
      */
     public void excelPre(MultipartFile file,String path);
 
+    /**
+     * excel预处理
+     * @param file excel文件流
+     * @param json json字符串
+     */
+    public void excelPreJson(MultipartFile file,String json);
+
 }

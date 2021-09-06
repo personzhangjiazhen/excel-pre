@@ -16,4 +16,14 @@ public interface ExcelTitleValidateService {
      * @param path
      */
     public List<RuleDO> validateExcelTitle(Sheet sheet, String path);
+
+
+
+    /**
+     * 校验传入的表头信息是否和预订的一致
+     * @param sheet
+     * @param json
+     * @return
+     */
+    public List<RuleDO> validateExcelTitleJson(Sheet sheet, String json);
 }

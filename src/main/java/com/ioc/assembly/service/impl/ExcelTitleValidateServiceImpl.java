@@ -101,6 +101,72 @@ public class ExcelTitleValidateServiceImpl implements ExcelTitleValidateService 
 
     }
 
+    @Override
+    public List<RuleDO> validateExcelTitleJson(Sheet sheet, String json) {
+        JSONArray originalTitleArray = new JSONArray();
+        JSONArray requestTitleArray = new JSONArray();
+        JSONArray jsonArray = new JSONArray();
+        List<RuleDO> ruleDOList = new ArrayList<>();
+        boolean firstRow = true;
+        try {
+            // 获取规则json文件
+            JSONObject requestJsonObject = JSON.parseObject(json);
+            jsonArray = requestJsonObject.getJSONArray("rule");
+
+            Iterator<Object> iterator = jsonArray.iterator();
+            while (iterator.hasNext()){
+                JSONObject jsonObject = (JSONObject) iterator.next();
+                RuleDO ruleDO = new RuleDO();
+                Map<String,Object> ruleInfoMap = new HashMap<>();
+                Set<String> keySet = jsonObject.keySet();
+                for (String key: keySet){
+                    if("title".equals(key)){
+                        originalTitleArray.add(jsonObject.getString(key));
+                    }else{
+                        // 校验key是否符合规则 因某列是可以不写校验规则的 所以不校验title的JSONArray和校验规则的JSONArray一致！
+                        if(validateKeyRule(key)){
+                            ruleDO.setRule(jsonObject.getString(key));
+                            ruleInfoMap.put("col",Integer.parseInt(key.substring(key.length()-1)));
+                        }else{
+                            ruleInfoMap.put(key,jsonObject.get(key));
+                        }
+                    }
+                }
+                ruleDO.setMap(ruleInfoMap);
+                ruleDOList.add(ruleDO);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            log.error(e.getMessage());
+            throw new RuntimeException("请确认json是否正确: json:" + json);
+        }
+        log.info("ruleDOList:  {}",ruleDOList.toString());
+        // 获取传入的表头信息
+        for (int i = sheet.getFirstRowNum(); i <= sheet.getLastRowNum(); i++) {
+            Row row = sheet.getRow(i);
+            //首行  提取注解
+            if(firstRow){
+                for (int j = row.getFirstCellNum(); j < row.getLastCellNum(); j++) {
+                    Cell cell = row.getCell(j);
+                    String cellValue = ExcelUtils.getCellValue(cell);
+                    requestTitleArray.add(cellValue);
+                }
+                firstRow = false;
+            }
+
+        }
+        log.info("请求的titles：{}",requestTitleArray.toJSONString());
+        log.info("原始的titles：{}",originalTitleArray.toJSONString());
+        log.info("请求的hashcode：{}",requestTitleArray.hashCode());
+        log.info("原始的hashcode：{}",originalTitleArray.hashCode());
+
+        if(requestTitleArray.hashCode() == originalTitleArray.hashCode()){
+            return ruleDOList;
+        }else{
+            throw new RuntimeException("请检查传入的Excel标题是否和模板相同！");
+        }
+    }
+
 
     /**
      * 校验key为 C开头，数字结尾；

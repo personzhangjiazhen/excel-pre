@@ -45,4 +45,18 @@ public class StrUtil {
         }
         return res;
     }
+
+
+    /**
+     * sql占位符替换方法
+     * @param sql
+     * @param parameters
+     * @return
+     */
+    public static String sqlSetValue(String sql,String[] parameters){
+        for(String value :parameters){
+            sql = sql.replaceFirst("\\?","'"+value+"'");
+        }
+        return sql;
+    }
 }
