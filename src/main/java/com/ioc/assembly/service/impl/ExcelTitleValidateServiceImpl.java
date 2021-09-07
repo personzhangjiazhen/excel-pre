@@ -4,8 +4,10 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.ioc.assembly.bean.RuleDO;
+import com.ioc.assembly.consts.RuleConsts;
 import com.ioc.assembly.service.ExcelTitleValidateService;
 import com.ioc.assembly.util.ExcelUtils;
+import com.ioc.assembly.util.ResourceUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.Charsets;
 import org.apache.commons.io.IOUtils;
@@ -39,12 +41,7 @@ public class ExcelTitleValidateServiceImpl implements ExcelTitleValidateService 
         boolean firstRow = true;
         try {
             // 获取规则json文件
-            ClassPathResource resource = new ClassPathResource(path);
-
-            JSONObject json = JSON.parseObject(IOUtils.toString(
-                    new FileInputStream(resource.getFile()), Charsets.UTF_8.toString()));
-
-            jsonArray = json.getJSONArray("rule");
+            jsonArray = ResourceUtils.getRuleJSONArray(RuleConsts.EXCEL_KEY,path);
 
             Iterator<Object> iterator = jsonArray.iterator();
             while (iterator.hasNext()){
@@ -111,7 +108,7 @@ public class ExcelTitleValidateServiceImpl implements ExcelTitleValidateService 
         try {
             // 获取规则json文件
             JSONObject requestJsonObject = JSON.parseObject(json);
-            jsonArray = requestJsonObject.getJSONArray("rule");
+            jsonArray = requestJsonObject.getJSONArray(RuleConsts.EXCEL_KEY);
 
             Iterator<Object> iterator = jsonArray.iterator();
             while (iterator.hasNext()){
