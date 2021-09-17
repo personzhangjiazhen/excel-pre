@@ -13,6 +13,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
@@ -40,6 +41,7 @@ public class ExcelPreServiceImpl implements ExcelPreService {
         String fileName = file.getOriginalFilename();
         if (!fileName.matches("^.+\\.(?i)(xls)$") && !fileName.matches("^.+\\.(?i)(xlsx)$")) {
             log.error("上传文件格式不正确");
+            throw new RuntimeException("请确认上传文件格式不正确");
         }
 
         Workbook workbook = null;
@@ -56,11 +58,14 @@ public class ExcelPreServiceImpl implements ExcelPreService {
             log.info("=====校验规则集合：{}======",rulesList);
             if(!CollectionUtils.isEmpty(rulesList)){
                 rulesList.stream().forEach(ruleDO -> {
-                    // 支持多规则校验
-                    String[] ruleArray = ruleDO.getRule().split(",");
-                    for(String rl :ruleArray){
-                        excelStrategyService.validByType(sheet,ruleDO.getMap(),rl);
+                    if(!StringUtils.isEmpty(ruleDO.getRule())){
+                        // 支持多规则校验
+                        String[] ruleArray = ruleDO.getRule().split(",");
+                        for(String rl :ruleArray){
+                            excelStrategyService.validByType(sheet,ruleDO.getMap(),rl);
+                        }
                     }
+
 
                 });
              }
@@ -77,6 +82,7 @@ public class ExcelPreServiceImpl implements ExcelPreService {
         String fileName = file.getOriginalFilename();
         if (!fileName.matches("^.+\\.(?i)(xls)$") && !fileName.matches("^.+\\.(?i)(xlsx)$")) {
             log.error("上传文件格式不正确");
+            throw new RuntimeException("请确认上传文件格式不正确");
         }
 
         Workbook workbook = null;
@@ -93,12 +99,13 @@ public class ExcelPreServiceImpl implements ExcelPreService {
             log.info("=====校验规则集合：{}======", rulesList);
             if(!CollectionUtils.isEmpty(rulesList)){
                 rulesList.stream().forEach(ruleDO -> {
-                    // 支持多规则校验
-                    String[] ruleArray = ruleDO.getRule().split(",");
-                    for(String rl :ruleArray){
-                        excelStrategyService.validByType(sheet,ruleDO.getMap(),rl);
+                    if(!StringUtils.isEmpty(ruleDO.getRule())){
+                        // 支持多规则校验
+                        String[] ruleArray = ruleDO.getRule().split(",");
+                        for(String rl :ruleArray){
+                            excelStrategyService.validByType(sheet,ruleDO.getMap(),rl);
+                        }
                     }
-
                 });
             }
 

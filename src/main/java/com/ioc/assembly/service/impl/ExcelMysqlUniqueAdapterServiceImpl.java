@@ -3,6 +3,7 @@ package com.ioc.assembly.service.impl;
 import com.ioc.assembly.consts.ExcelConsts;
 import com.ioc.assembly.responsity.TableUniqueResponsity;
 import com.ioc.assembly.service.ExcelAdapterService;
+import com.ioc.assembly.service.ExcelMysqlParamsPreService;
 import com.ioc.assembly.util.ExcelUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -22,7 +23,8 @@ public class ExcelMysqlUniqueAdapterServiceImpl implements ExcelAdapterService {
 
     @Autowired
     private TableUniqueResponsity tableUniqueResponsity;
-
+    @Autowired
+    private ExcelMysqlParamsPreService excelMysqlParamsPreService;
 
     @Override
     public void valid(Sheet sheet, Map<String,Object> paramMap) {
@@ -32,7 +34,7 @@ public class ExcelMysqlUniqueAdapterServiceImpl implements ExcelAdapterService {
         log.info("数据库值唯一校验开始............");
         Integer col = (Integer) paramMap.get("col");
 
-
+        // 获取是否判断值为空
         if(null != paramMap.get("inn") ){
             isNotNull = (Boolean) paramMap.get("inn");
         }
@@ -68,6 +70,8 @@ public class ExcelMysqlUniqueAdapterServiceImpl implements ExcelAdapterService {
                         String params = (String) paramMap.get("params");
                         if(null != paramMap.get("containsCell")){
                             containsCell = (Boolean) paramMap.get("containsCell");
+                        }else{ // 如果containsCell为false，才走这个逻辑，因为这个逻辑已经包含了containsCell这个逻辑
+                            params = excelMysqlParamsPreService.paramsPre(cellValue,params);
                         }
                         // 把当前列的值作为参数拼接到参数值中
                         if(containsCell){

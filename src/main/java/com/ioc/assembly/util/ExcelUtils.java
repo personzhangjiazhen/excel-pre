@@ -203,7 +203,18 @@ public class ExcelUtils {
             if (HSSFDateUtil.isCellDateFormatted(cell)) {
                 return HSSFDateUtil.getJavaDate(cell.getNumericCellValue()).toString();
             } else {
-                return BigDecimal.valueOf(cell.getNumericCellValue()).toString();
+                // 解决整数变为浮点数问题
+                Object inputValue = null;// 单元格值
+                Long longVal = Math.round(cell.getNumericCellValue());
+                Double doubleVal = cell.getNumericCellValue();
+                if(Double.parseDouble(longVal + ".0") == doubleVal){   //判断是否含有小数位.0
+                    inputValue = longVal;
+                }
+                if(null != inputValue){
+                    return String.valueOf(inputValue);
+                }else{
+                    return BigDecimal.valueOf(cell.getNumericCellValue()).toString();
+                }
             }
         } else if (cell.getCellType() == Cell.CELL_TYPE_STRING) {
             return StringUtils.trimToEmpty(cell.getStringCellValue());

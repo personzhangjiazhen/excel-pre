@@ -22,7 +22,7 @@ public class ResourceUtils {
     public static JSONArray getRuleJSONArray(String key,String path) throws IOException {
         ClassPathResource resource = new ClassPathResource(path);
         JSONObject json = JSON.parseObject(IOUtils.toString(
-                new FileInputStream(resource.getFile()), Charsets.UTF_8.toString()));
+                resource.getInputStream(), Charsets.UTF_8.toString()));
         JSONArray jsonArray = json.getJSONArray(key);
         return jsonArray;
     }

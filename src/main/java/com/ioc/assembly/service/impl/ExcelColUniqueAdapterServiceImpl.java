@@ -27,6 +27,8 @@ public class ExcelColUniqueAdapterServiceImpl implements ExcelAdapterService {
             isNotNull = (Boolean) paramMap.get("inn");
         }
         List<String> list = new ArrayList<String>();
+        Integer rows = 0;
+        try {
         for (int i = sheet.getFirstRowNum()+1; i <= sheet.getLastRowNum(); i++) {
             Row row = sheet.getRow(i);
 
@@ -43,8 +45,7 @@ public class ExcelColUniqueAdapterServiceImpl implements ExcelAdapterService {
                     list.add(cellValue);
             }
         }
-        Integer row = 0;
-        try {
+
             String temp = "";
             for (int i = 0; i < list.size() - 1; i++)
             {
@@ -53,7 +54,7 @@ public class ExcelColUniqueAdapterServiceImpl implements ExcelAdapterService {
                 {
                     if (temp.equals(list.get(j)))
                     {
-                        row = j + 1;
+                        rows = j + 1;
                         log.error("第" + (i + 1) + "个跟第" + (j + 1) + "个重复，值是：" + temp);
                         throw new RuntimeException( temp+"已存在,校验规则不匹配！" );
                     }
@@ -62,7 +63,7 @@ public class ExcelColUniqueAdapterServiceImpl implements ExcelAdapterService {
         }catch (Exception e){
             e.printStackTrace();
 
-            throw new RuntimeException("第"+row+"行，第"+col+"列数据错误，请检查数据是否正确！");
+            throw new RuntimeException("第"+rows+"行，第"+col+"列数据错误，请检查数据是否正确！");
         }
 
         log.info("某一列值唯一校验结束..........");

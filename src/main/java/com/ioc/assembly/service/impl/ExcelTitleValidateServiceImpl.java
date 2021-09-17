@@ -123,7 +123,8 @@ public class ExcelTitleValidateServiceImpl implements ExcelTitleValidateService 
                         // 校验key是否符合规则 因某列是可以不写校验规则的 所以不校验title的JSONArray和校验规则的JSONArray一致！
                         if(validateKeyRule(key)){
                             ruleDO.setRule(jsonObject.getString(key));
-                            ruleInfoMap.put("col",Integer.parseInt(key.substring(key.length()-1)));
+                            int first_c = key.indexOf("C");
+                            ruleInfoMap.put("col",Integer.parseInt(key.substring(first_c+1)));
                         }else{
                             ruleInfoMap.put(key,jsonObject.get(key));
                         }
@@ -172,7 +173,7 @@ public class ExcelTitleValidateServiceImpl implements ExcelTitleValidateService 
      */
     private  Boolean validateKeyRule(String rule){
         // 首先校验key的长度是否为2
-        if(2 != rule.length()){
+        if(rule.length() < 2){
             return  false;
         }
         // 校验是以C开头
